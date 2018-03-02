@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../relax/.idea/express-mongodb.iml" filepath="$PROJECT_DIR$/../relax/.idea/express-mongodb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/relax.iml" filepath="$PROJECT_DIR$/.idea/relax.iml" />
     </modules>
   </component>
 </project>
