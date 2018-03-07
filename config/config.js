@@ -1,34 +1,35 @@
-const path = require('path');
-const rootPath = path.normalize(__dirname + '/..');
-const env = process.env.NODE_ENV || 'development';
+const path = require("path");
+const rootPath = path.normalize(__dirname + "/..");
+const env = process.env.NODE_ENV || "development";
 
 const config = {
-  development: {
-    root: rootPath,
-    app: {
-      name: 'express-mongodb'
+    development: {
+        root: rootPath,
+        app: {
+            name: "relax"
+        },
+        port: process.env.PORT || 3000,
+        uploadDir: "./public/uploads/",
+        db: "mongodb://mongodb/data_development"
     },
-    port: process.env.PORT || 3000,
-    db: 'mongodb://mongodb/data-development'
-  },
-
-  test: {
-    root: rootPath,
-    app: {
-      name: 'express-mongodb'
+    
+    test: {
+        root: rootPath,
+        app: {
+            name: "relax"
+        },
+        port: process.env.PORT || 3000,
+        db: "mongodb://mongodb/data_test"
     },
-    port: process.env.PORT || 3000,
-    db: 'mongodb://mongodb/data-test'
-  },
-
-  production: {
-    root: rootPath,
-    app: {
-      name: 'express-mongodb'
-    },
-    port: process.env.PORT || 3000,
-    db: 'mongodb://mongodb/data-production'
-  }
+    
+    production: {
+        root: rootPath,
+        app: {
+            name: "relax"
+        },
+        port: process.env.PORT || 3000,
+        db: "mongodb://mongodb/data_production"
+    }
 };
 
 module.exports = config[env];

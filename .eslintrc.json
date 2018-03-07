@@ -1,0 +1,20 @@
+{
+  "extends": "eslint:recommended",
+  "rules": {
+    "semi": ["error", "always"],
+    "quotes": ["error", "double"],
+    "strict": "error",
+    "no-var":"error",
+    "indent": ["error", 4]
+  },
+  "parserOptions": {
+    "ecmaVersion" : 6,
+    "sourceType": "module"
+  },
+  "env": {
+    "es6": true,
+    "node": true,
+    "browser": true,
+    "mocha": true
+  }
+}
