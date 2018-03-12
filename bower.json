@@ -1,9 +1,9 @@
 {
-    "name": "express-mongodb",
-    "version": "0.0.1",
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "components"
-    ]
+  "name": "express-mongodb",
+  "version": "0.0.1",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ]
 }

@@ -3,9 +3,9 @@
   "rules": {
     "semi": ["error", "always"],
     "quotes": ["error", "double"],
-    "strict": "error",
     "no-var":"error",
-    "indent": ["error", 4]
+    "strict": 0
+    //        "indent": ["error", 4]
   },
   "parserOptions": {
     "ecmaVersion" : 6,

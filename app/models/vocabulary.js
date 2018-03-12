@@ -1,20 +1,17 @@
 // Vocabulary model
 
-const mongoose =  require("mongoose");
-const Schema = mongoose.Schema;
-// const moment = require("moment");
+const mongoose = require("mongoose");
+const schema   = mongoose.Schema;
 
-// let now = moment(moment.now().ISO_8601).format();
-const VocabularySchema = new Schema({
-    title: {
-        type: String,
-        unique: true
-    },
+const vocabularySchema = new schema({
+  title: {
     type: String,
-    spelling: String,
-    meaning: String,
-    image: String
+    unique: true
+  },
+  type: String,
+  spelling: String,
+  meaning: String,
+  image: String
 });
-VocabularySchema.virtual("date")
-    .get(() => this._id.getTimestamp());
-mongoose.model("Vocabulary", VocabularySchema);
+vocabularySchema.index({ title: 1 });
+mongoose.model("Vocabulary", vocabularySchema);

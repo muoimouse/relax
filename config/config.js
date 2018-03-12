@@ -3,33 +3,33 @@ const rootPath = path.normalize(__dirname + "/..");
 const env = process.env.NODE_ENV || "development";
 
 const config = {
-    development: {
-        root: rootPath,
-        app: {
-            name: "relax"
-        },
-        port: process.env.PORT || 3000,
-        uploadDir: "./public/uploads/",
-        db: "mongodb://mongodb/data_development"
+  development: {
+    root: rootPath,
+    app: {
+      name: "relax"
     },
-    
-    test: {
-        root: rootPath,
-        app: {
-            name: "relax"
-        },
-        port: process.env.PORT || 3000,
-        db: "mongodb://mongodb/data_test"
+    port: process.env.PORT || 3000,
+    uploadDir: "./public/uploads/",
+    db: "mongodb://mongodb/data_development"
+  },
+  
+  test: {
+    root: rootPath,
+    app: {
+      name: "relax"
     },
-    
-    production: {
-        root: rootPath,
-        app: {
-            name: "relax"
-        },
-        port: process.env.PORT || 3000,
-        db: "mongodb://mongodb/data_production"
-    }
+    port: process.env.PORT || 3000,
+    db: "mongodb://mongodb/data_test"
+  },
+  
+  production: {
+    root: rootPath,
+    app: {
+      name: "relax"
+    },
+    port: process.env.PORT || 3000,
+    db: "mongodb://mongodb/data_production"
+  }
 };
 
 module.exports = config[env];
