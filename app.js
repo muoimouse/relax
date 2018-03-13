@@ -1,7 +1,6 @@
 const express = require("express");
 const config = require("./config/config");
 const glob = require("glob");
-// const multer = require("multer");
 const mongoose = require("mongoose");
 
 mongoose.connect(config.db);
@@ -16,11 +15,6 @@ models.forEach(function (model) {
   require(model);
 });
 const app = express();
-// app.set(multer({ dest: "./public/uploads/" }));
-// app.use(multer({ dest: "./public/uploads/" }).any());
-// / app.use(bodyParser({
-//     uploadDir: path.join((__dirname, "../public/upload/temp"))
-// }));
 
 module.exports = require("./config/express")(app, config);
 

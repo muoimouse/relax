@@ -13,7 +13,9 @@ const userSchema = new schema({
   },
   password: {
     type: String,
-    require: true
+    min: 8,
+    max: 16,
+    require: true,
   },
   type: {
     type: String,

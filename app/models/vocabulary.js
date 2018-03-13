@@ -6,11 +6,22 @@ const schema   = mongoose.Schema;
 const vocabularySchema = new schema({
   title: {
     type: String,
-    unique: true
+    unique: true,
+    require: true,
   },
-  type: String,
-  spelling: String,
-  meaning: String,
+  type: {
+    type: String,
+    enum: ["nouns", "adjectives", "adverbs", "verbs"],
+    require: true,
+  },
+  spelling: {
+    type: String,
+    require: true,
+  },
+  meaning: {
+    type: String,
+    require: true,
+  },
   image: String
 });
 vocabularySchema.index({ title: 1 });

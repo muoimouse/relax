@@ -2,10 +2,11 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const userModel = mongoose.model("User");
-const User = require("../services/user.service")(userModel);
+const userService = require("../services/user.service")(userModel);
 const moment = require("moment");
 const multer = require("multer");
-const fs = require("fs");
+
+const passport = require("../services/passport.service");
 
 let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
@@ -19,69 +20,30 @@ let imageFilter = (req, file, cb) => {
 let upload = multer({dest: `./public/uploads/user/${today}/`, fileFilter: imageFilter});
 
 module.exports = (app) => {
-  app.use("/user", router);
+  app.use("/user", passport.authenticate("jwt", { session: false }), router);
 };
 
 router.get("/", (req, res) => {
-  User.get(req.query, (results) => {
+  userService.getUser(req.query, (results) => {
     return res.json(results);
   });
 });
 
 router.put("/", upload.single("image"), (req, res) => {
-  User.saveUser(req.body, req.file, (results) => {
+  userService.updateUser(req.body, req.file, (results) => {
     return res.json(results);
   });
 });
 
-router.post("/", upload.single("image"), (req, res, next) => {
-  let updateData = req.body;
-  
-  if (!updateData.email) {
-    return res.json(new Error(errorCodes.InvalidEmail));
-  }
-  
-  // Update fileName
-  let fileName = changeFileName(req);
-  if (fileName !== updateData.email) {
-    updateData.image = today + "/" + fileName;
-  }
-  userModel.where().findOneAndUpdate({email: updateData.email}, {$set: updateData}, (err, result) => {
-    if (err) {
-      if (req.file) {
-        fs.unlinkSync(`./public/uploads/user/${today}/${req.file.filename}`);
-      }
-      return next(err);
-    }
-    if (!result) {
-      return res.json({message: errorCodes.UpdateFail});
-    }
-    if (req.file) {
-      fs.renameSync(`./public/uploads/user/${today}/${req.file.filename}`, `./public/uploads/user/${today}/${fileName}`, (err) => {
-        if (err) {
-          return next(err);
-        }
-      });
-    }
-    return res.json({message: "updateCompleted"});
+router.post("/", upload.single("image"), (req, res) => {
+  userService.saveUser(req.body, req.file, (results) => {
+    return res.json(results);
   });
 });
 
 router.delete("/", (req, res) => {
-  let email = req.body.email;
-  if (!email) {
-    return res.json({errCode: errorCodes.InvalidEmail});
-  }
-  userModel.findOne({email: email}, (err, result) => {
-    if (err || !result || result.type === "admin") {
-      return res.json({errCode: errorCodes.RemoveFail});
-    }
-    userModel.where().findOneAndRemove({email: req.body.email}, (err, result) => {
-      if (err || !result) {
-        return res.json({errCode: errorCodes.RemoveFail});
-      }
-      return res.json({message: "removeSuccessful"});
-    });
+  userService.deleteUser(req.body, (results) => {
+    return res.json(results);
   });
 });
 

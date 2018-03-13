@@ -5,7 +5,6 @@
     "quotes": ["error", "double"],
     "no-var":"error",
     "strict": 0
-    //        "indent": ["error", 4]
   },
   "parserOptions": {
     "ecmaVersion" : 6,

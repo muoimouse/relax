@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const moment = require("moment");
+const validator = require("validator");
 
 let errorCodes = {
   InvalidInput: "InvalidInput",
@@ -9,37 +10,53 @@ let errorCodes = {
   InvalidPassword: "InvalidPassword",
   UpdateFail: "UpdateFail",
   SaveFail: "SaveFail",
-  RemoveFail: "RemoveFail"
+  RemoveFail: "RemoveFail",
+  GetFail: "GetFail",
 };
 
 let messageCodes = {
-
+  SaveSuccessful: "SaveSuccessful",
+  UpdateSuccessful: "UpdateSuccessful",
+  DeleteSuccessful: "DeleteSuccessful",
 };
 
 let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
 module.exports = (userModel) => {
   return {
-    get: (user, cb) => {
+    /**
+     * @function getUser
+     * @param user
+     * @param cb
+     * @return object
+     */
+    getUser: (user, cb) => {
       userModel.find(user, (err, result) => {
         if (err) {
-          return cb({ errCode: "getUserFail" });
+          return cb({ errCode: errorCodes.GetFail });
         }
         return cb(result);
       });
     },
+    /**
+     * @function saveUser
+     * @param user
+     * @param file
+     * @param cb
+     * @return object
+     */
     saveUser: (user, file, cb) => {
       // validate
       if (!user) {
         return cb({ errCode: errorCodes.InvalidInput });
       }
-      if (!user.email) {
+      if (!user.email || !validator.isEmail(user.email)) {
         return cb({ errorCode: errorCodes.InvalidEmail });
       }
       if (!user.password) {
         return cb({ errorCode: errorCodes.InvalidPassword });
       }
-  
+      
       // change fileName
       let fileName = changeFileName(user, file);
       if (fileName !== user.email) {
@@ -57,9 +74,59 @@ module.exports = (userModel) => {
         if (file) {
           fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/user/${user.image}`);
         }
-        return cb({ message: "saveCompleted" });
+        return cb({ message: messageCodes.SaveSuccessful });
       });
-    }
+    },
+    /**
+     * @function updateUser
+     * @param user
+     * @param file
+     * @param cb
+     */
+    updateUser: (user, file, cb) => {
+      // Validate email is exist;
+      if (!user.email || !validator.isEmail(user.email)) {
+        return cb({ errCode: errorCodes.InvalidEmail });
+      }
+      
+      // Update fileName
+      let fileName = changeFileName(user, file);
+      if (fileName !== user.email) {
+        user.image = today + "/" + fileName;
+      }
+      
+      userModel.where().findOneAndUpdate({email: user.email}, {$set: user}, (err) => {
+        if (err) {
+          if (file) {
+            fs.unlinkSync(`./public/uploads/user/${today}/${file.filename}`);
+          }
+          return cb({ errCode: errorCodes.UpdateFail });
+        }
+        if (file) {
+          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/user/${today}/${fileName}`);
+        }
+        return cb({ message: messageCodes.UpdateSuccessful });
+      });
+    },
+    
+    deleteUser: (user, cb) => {
+      let email = user.email;
+      if (!email || !validator.isEmail(email)) {
+        return cb({ errCode: errorCodes.InvalidEmail });
+      }
+      
+      userModel.findOne({email: email}, (err, result) => {
+        if (err || !result || result.type === "admin") {
+          return cb({errCode: errorCodes.RemoveFail});
+        }
+        userModel.where().findOneAndRemove({email: email}, (err, result) => {
+          if (err || !result) {
+            return cb({ errCode: errorCodes.RemoveFail });
+          }
+          return cb({ message: messageCodes.DeleteSuccessful });
+        });
+      });
+    },
   };
 };
 
