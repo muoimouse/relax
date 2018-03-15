@@ -20,7 +20,7 @@ let upload = multer({ dest: `./public/uploads/vocabulary/${today}/`, fileFilter:
 
 
 module.exports = (app) => {
-  app.use("/vocabulary", router);
+  app.use("/api/vocabulary", router);
 };
 
 router.get("/", (req, res) => {

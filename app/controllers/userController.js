@@ -20,10 +20,14 @@ let imageFilter = (req, file, cb) => {
 let upload = multer({dest: `./public/uploads/user/${today}/`, fileFilter: imageFilter});
 
 module.exports = (app) => {
-  app.use("/user", passport.authenticate("jwt", { session: false }), router);
+  app.use("/api/user",router);
+  // app.use("/api/user", router);
 };
 
+// router.set("/", passport.authenticate("jwt", { session: false }));
+
 router.get("/", (req, res) => {
+  console.log(req.headers);
   userService.getUser(req.query, (results) => {
     return res.json(results);
   });

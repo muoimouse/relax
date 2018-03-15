@@ -11,6 +11,10 @@ const userSchema = new schema({
     unique: true,
     require: true
   },
+  name: {
+    type: String,
+    default: "XXX"
+  },
   password: {
     type: String,
     min: 8,
@@ -39,7 +43,7 @@ userSchema.index({ email: 1 });
 let userModel = mongoose.model("User", userSchema);
 
 let user = {
-  email: "admin@admin",
+  email: "admin@admin.com",
   password: "admin",
   type: "admin"
 };
