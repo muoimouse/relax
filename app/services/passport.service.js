@@ -22,4 +22,5 @@ passport.use(new JwtStrategy(jwtOption, (jwt_payload, done) => {
   });
 }));
 
-module.exports = passport;
+module.exports.isAuthenticated = passport.authenticate("jwt", { session: false });
+module.exports.initialize =  passport.initialize();

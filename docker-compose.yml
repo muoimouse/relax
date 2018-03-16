@@ -26,11 +26,10 @@ services:
     working_dir: /var/www/html/app
     command: >
        bash -c "npm install && npm install -g gulp@3.9.0 && gulp"
-#      bash -c "npm install && npm install -g pm2 && pm2 start app.js"
     ports:
       - 3000:3000
   nginx:
-    image: nginx:1.13.3
+    image: nginx:1.13.8
     volumes:
       - ./config/nginx/default.conf:/etc/nginx/conf.d/default.conf
     restart: always

@@ -46,6 +46,7 @@ module.exports = (userModel) => {
      * @return object
      */
     saveUser: (user, file, cb) => {
+      console.log(file);
       // validate
       if (!user) {
         return cb({ errCode: errorCodes.InvalidInput });
@@ -56,13 +57,17 @@ module.exports = (userModel) => {
       if (!user.password) {
         return cb({ errorCode: errorCodes.InvalidPassword });
       }
-      
+      if (!user.name) {
+        let email = user.email;
+        user.name = email.substring(0, email.indexOf("@"));
+      }
+
       // change fileName
       let fileName = changeFileName(user, file);
       if (fileName !== user.email) {
-        user.image = today + "/" + fileName;
+        user.image = "user"+ "/" + today + "/" + fileName;
       }
-      
+
       let saveUser = new userModel(user);
       saveUser.save((err) => {
         if (err) {
@@ -72,7 +77,7 @@ module.exports = (userModel) => {
           return cb({ errCode: errorCodes.SaveFail });
         }
         if (file) {
-          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/user/${user.image}`);
+          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/${user.image}`);
         }
         return cb({ message: messageCodes.SaveSuccessful });
       });
@@ -88,13 +93,13 @@ module.exports = (userModel) => {
       if (!user.email || !validator.isEmail(user.email)) {
         return cb({ errCode: errorCodes.InvalidEmail });
       }
-      
+
       // Update fileName
       let fileName = changeFileName(user, file);
       if (fileName !== user.email) {
-        user.image = today + "/" + fileName;
+        user.image = "user" + "/" + today + "/" + fileName;
       }
-      
+
       userModel.where().findOneAndUpdate({email: user.email}, {$set: user}, (err) => {
         if (err) {
           if (file) {
@@ -103,18 +108,18 @@ module.exports = (userModel) => {
           return cb({ errCode: errorCodes.UpdateFail });
         }
         if (file) {
-          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/user/${today}/${fileName}`);
+          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/${user.image}}`);
         }
         return cb({ message: messageCodes.UpdateSuccessful });
       });
     },
-    
+
     deleteUser: (user, cb) => {
       let email = user.email;
       if (!email || !validator.isEmail(email)) {
         return cb({ errCode: errorCodes.InvalidEmail });
       }
-      
+
       userModel.findOne({email: email}, (err, result) => {
         if (err || !result || result.type === "admin") {
           return cb({errCode: errorCodes.RemoveFail});

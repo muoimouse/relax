@@ -11,7 +11,7 @@ let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
 // Set up upload file with multer
 let imageFilter = (req, file, cb) => {
-  if ("image/jpeg" && "image/jpg" && "image/png" !== file.mimetype && file.size > 2000000) {
+  if (!["image/jpeg","image/jpg", "image/png"].includes(file.mimetype) || file.size > 1000000) {
     return cb(null, false);
   }
   return cb(null, true);

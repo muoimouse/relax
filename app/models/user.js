@@ -3,7 +3,8 @@
 const mongoose = require("mongoose");
 const schema   = mongoose.Schema;
 const moment = require("moment");
-let now = moment(moment.now().ISO_8601).format();
+const bcrypt = require("bcrypt-nodejs");
+let now = moment(moment.now().ISO_8601).format("YYYY/MM/DDThh:mm:ssZ");
 
 const userSchema = new schema({
   email: {
@@ -13,7 +14,7 @@ const userSchema = new schema({
   },
   name: {
     type: String,
-    default: "XXX"
+    default: "anonymous"
   },
   password: {
     type: String,
@@ -31,7 +32,8 @@ const userSchema = new schema({
     default: now
   },
   image: {
-    type: String
+    type: String,
+    default: "user/admin.jpeg"
   },
   token: {
     type: String
@@ -44,16 +46,17 @@ let userModel = mongoose.model("User", userSchema);
 
 let user = {
   email: "admin@admin.com",
+  name: "admin",
   password: "admin",
-  type: "admin"
+  type: "admin",
 };
-userModel.findOne(user, (error, result) => {
+userModel.findOne({ email: user.email }, (error, result) => {
   if (error) {
     throw error;
   }
   if (!result) {
     let userDefault = new userModel(user);
-    userModel.create(userDefault);
+    return userModel.create(userDefault);
   }
 });
 

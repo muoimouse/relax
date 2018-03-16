@@ -5,6 +5,7 @@ const env = process.env.NODE_ENV || "development";
 const config = {
   development: {
     root: rootPath,
+    domain: "relax.xxx",
     app: {
       name: "relax"
     },
@@ -12,7 +13,7 @@ const config = {
     uploadDir: "./public/uploads/",
     db: "mongodb://mongodb/data_development"
   },
-  
+
   test: {
     root: rootPath,
     app: {
@@ -21,7 +22,7 @@ const config = {
     port: process.env.PORT || 3000,
     db: "mongodb://mongodb/data_test"
   },
-  
+
   production: {
     root: rootPath,
     app: {
