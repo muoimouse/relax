@@ -12,7 +12,6 @@ let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
 // Set up upload file with multer
 let imageFilter = (req, file, cb) => {
-  console.log(file);
   if (!["image/jpeg","image/jpg", "image/png"].includes(file.mimetype) || file.size > 1000000) {
     return cb(null, false);
   }
@@ -42,7 +41,7 @@ router.post("/", isAuthenticate, upload.single("image"), (req, res) => {
   });
 });
 
-router.delete("/", (req, res) => {
+router.delete("/", isAuthenticate, (req, res) => {
   userService.deleteUser(req.body, (results) => {
     return res.json(results);
   });

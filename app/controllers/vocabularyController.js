@@ -3,6 +3,7 @@ const router = express.Router();
 const mongoose = require("mongoose");
 const vocabularyModel = mongoose.model("Vocabulary");
 const vocabularyService = require("../services/vocabulary.service")(vocabularyModel);
+const isAuthenticate = require("../services/passport.service").isAuthenticated;
 const moment = require("moment");
 const multer = require("multer");
 
@@ -24,24 +25,24 @@ module.exports = (app) => {
 };
 
 router.get("/", (req, res) => {
-  vocabularyService.getVocabulary(req.body, (results) => {
+  vocabularyService.getVocabulary(req.query, (results) => {
     return res.json(results);
   });
 });
 
-router.put("/", upload.single("image"), (req, res) => {
+router.put("/", isAuthenticate, upload.single("image"), (req, res) => {
   vocabularyService.updateVocabulary(req.body, req.file, (results) => {
     return res.json(results);
   });
 });
 
-router.post("/", upload.single("image"), (req, res) => {
+router.post("/", isAuthenticate, upload.single("image"), (req, res) => {
   vocabularyService.saveVocabulary(req.body, req.file, (results) => {
     return res.json(results);
   });
 });
 
-router.delete("/", (req, res) => {
+router.delete("/", isAuthenticate, (req, res) => {
   vocabularyService.deleteVocabulary(req.body, (results) => {
     return res.json(results);
   });
