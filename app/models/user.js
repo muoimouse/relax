@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 const schema   = mongoose.Schema;
 const moment = require("moment");
-const bcrypt = require("bcrypt-nodejs");
+// const bcrypt = require("bcrypt-nodejs");
 let now = moment(moment.now().ISO_8601).format("YYYY/MM/DDThh:mm:ssZ");
 
 const userSchema = new schema({
