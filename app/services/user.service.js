@@ -114,7 +114,7 @@ module.exports = userModel => {
           if (file) {
             fs.renameSync(
               `./public/uploads/user/${today}/${file.filename}`,
-              `./public/uploads/${user.image}}`
+              `./public/uploads/${user.image}`
             );
           }
           return cb({ message: messageCodes.UpdateSuccessful });
