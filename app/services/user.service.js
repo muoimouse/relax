@@ -11,18 +11,18 @@ let errorCodes = {
   UpdateFail: "UpdateFail",
   SaveFail: "SaveFail",
   RemoveFail: "RemoveFail",
-  GetFail: "GetFail",
+  GetFail: "GetFail"
 };
 
 let messageCodes = {
   SaveSuccessful: "SaveSuccessful",
   UpdateSuccessful: "UpdateSuccessful",
-  DeleteSuccessful: "DeleteSuccessful",
+  DeleteSuccessful: "DeleteSuccessful"
 };
 
 let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
-module.exports = (userModel) => {
+module.exports = userModel => {
   return {
     /**
      * @function getUser
@@ -46,7 +46,6 @@ module.exports = (userModel) => {
      * @return object
      */
     saveUser: (user, file, cb) => {
-      console.log(file);
       // validate
       if (!user) {
         return cb({ errCode: errorCodes.InvalidInput });
@@ -65,11 +64,11 @@ module.exports = (userModel) => {
       // change fileName
       let fileName = changeFileName(user, file);
       if (fileName !== user.email) {
-        user.image = "user"+ "/" + today + "/" + fileName;
+        user.image = "user" + "/" + today + "/" + fileName;
       }
 
       let saveUser = new userModel(user);
-      saveUser.save((err) => {
+      saveUser.save(err => {
         if (err) {
           if (file) {
             fs.unlinkSync(`./public/uploads/user/${today}/${file.filename}`);
@@ -77,7 +76,10 @@ module.exports = (userModel) => {
           return cb({ errCode: errorCodes.SaveFail });
         }
         if (file) {
-          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/${user.image}`);
+          fs.renameSync(
+            `./public/uploads/user/${today}/${file.filename}`,
+            `./public/uploads/${user.image}`
+          );
         }
         return cb({ message: messageCodes.SaveSuccessful });
       });
@@ -100,18 +102,23 @@ module.exports = (userModel) => {
         user.image = "user" + "/" + today + "/" + fileName;
       }
 
-      userModel.where().findOneAndUpdate({email: user.email}, {$set: user}, (err) => {
-        if (err) {
-          if (file) {
-            fs.unlinkSync(`./public/uploads/user/${today}/${file.filename}`);
+      userModel
+        .where()
+        .findOneAndUpdate({ email: user.email }, { $set: user }, err => {
+          if (err) {
+            if (file) {
+              fs.unlinkSync(`./public/uploads/user/${today}/${file.filename}`);
+            }
+            return cb({ errCode: errorCodes.UpdateFail });
           }
-          return cb({ errCode: errorCodes.UpdateFail });
-        }
-        if (file) {
-          fs.renameSync(`./public/uploads/user/${today}/${file.filename}`, `./public/uploads/${user.image}}`);
-        }
-        return cb({ message: messageCodes.UpdateSuccessful });
-      });
+          if (file) {
+            fs.renameSync(
+              `./public/uploads/user/${today}/${file.filename}`,
+              `./public/uploads/${user.image}}`
+            );
+          }
+          return cb({ message: messageCodes.UpdateSuccessful });
+        });
     },
 
     deleteUser: (user, cb) => {
@@ -120,21 +127,20 @@ module.exports = (userModel) => {
         return cb({ errCode: errorCodes.InvalidEmail });
       }
 
-      userModel.findOne({email: email}, (err, result) => {
+      userModel.findOne({ email: email }, (err, result) => {
         if (err || !result || result.type === "admin") {
-          return cb({errCode: errorCodes.RemoveFail});
+          return cb({ errCode: errorCodes.RemoveFail });
         }
-        userModel.where().findOneAndRemove({email: email}, (err, result) => {
+        userModel.where().findOneAndRemove({ email: email }, (err, result) => {
           if (err || !result) {
             return cb({ errCode: errorCodes.RemoveFail });
           }
           return cb({ message: messageCodes.DeleteSuccessful });
         });
       });
-    },
+    }
   };
 };
-
 
 //-------------------------------
 
