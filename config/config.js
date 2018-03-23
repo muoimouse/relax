@@ -1,6 +1,6 @@
 const path = require("path");
 const rootPath = path.normalize(__dirname + "/..");
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || "production";
 
 const config = {
   development: {
@@ -29,7 +29,8 @@ const config = {
       name: "relax"
     },
     port: process.env.PORT || 3000,
-    db: "mongodb://mongodb/data_production"
+    db:
+      "mongodb://muoimouse:0p0p1wwm@relax-shard-00-00-2ibkv.mongodb.net:27017,relax-shard-00-01-2ibkv.mongodb.net:27017,relax-shard-00-02-2ibkv.mongodb.net:27017/test?ssl=true&replicaSet=relax-shard-0&authSource=admin"
   }
 };
 
