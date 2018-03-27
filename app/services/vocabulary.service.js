@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const moment = require("moment");
+let now = moment(moment.now().ISO_8601).format("YYYY/MM/DDThh:mm:ssZ");
 
 let errorCodes = {
   InvalidTitle: "InvalidTitle",
@@ -11,20 +12,19 @@ let errorCodes = {
   UpdateFail: "UpdateFail",
   SaveFail: "SaveFail",
   DeleteFail: "DeleteFail",
-  GetFail: "GetFail",
+  GetFail: "GetFail"
 };
 
 let messageCodes = {
   SaveSuccessful: "SaveSuccessful",
   UpdateSuccessful: "UpdateSuccessful",
-  DeleteSuccessful: "DeleteSuccessful",
+  DeleteSuccessful: "DeleteSuccessful"
 };
 
 let today = moment(moment.now().ISO_8601).format("YYYY-MM-DD");
 
-module.exports = (vocabularyModel) => {
+module.exports = vocabularyModel => {
   return {
-
     /**
      * @function getVocabulary
      * @param vocabulary
@@ -33,9 +33,24 @@ module.exports = (vocabularyModel) => {
     getVocabulary: (vocabulary, cb) => {
       vocabularyModel.find(vocabulary, (err, results) => {
         if (err) {
-          return cb({errCode: errorCodes.GetFail});
+          return cb({ errCode: errorCodes.GetFail });
         }
         return cb(results);
+      });
+    },
+
+    /**
+     * @function getRandomVocabulary
+     * @param cb
+     * @returns vocabulary info
+     */
+    getRamdomVocabulary: (vocabulary, cb) => {
+      vocabularyModel.find(vocabulary, (err, results) => {
+        if (err) {
+          return cb({ errCode: errorCodes.GetFail });
+        }
+        let random = Math.floor(Math.random() * results.length);
+        return cb([results[random]]);
       });
     },
 
@@ -47,16 +62,16 @@ module.exports = (vocabularyModel) => {
      */
     saveVocabulary: (vocabulary, file, cb) => {
       if (!vocabulary || !vocabulary.title) {
-        return cb({errCode: errorCodes.InvalidTitle});
+        return cb({ errCode: errorCodes.InvalidTitle });
       }
       if (!vocabulary.type) {
-        return cb({errCode: errorCodes.InvalidType});
+        return cb({ errCode: errorCodes.InvalidType });
       }
       if (!vocabulary.spelling) {
-        return cb({errCode: errorCodes.InvalidSpelling});
+        return cb({ errCode: errorCodes.InvalidSpelling });
       }
       if (!vocabulary.meaning) {
-        return cb({errCode: errorCodes.InvalidMeaning});
+        return cb({ errCode: errorCodes.InvalidMeaning });
       }
 
       // change fileName
@@ -66,17 +81,22 @@ module.exports = (vocabularyModel) => {
       }
 
       let saveVocabulary = new vocabularyModel(vocabulary);
-      saveVocabulary.save((err) => {
+      saveVocabulary.save(err => {
         if (err) {
           if (file) {
-            fs.unlinkSync(`./public/uploads/vocabulary/${ today }/${ file.filename }`);
+            fs.unlinkSync(
+              `./public/uploads/vocabulary/${today}/${file.filename}`
+            );
           }
-          return cb({errCode: errorCodes.SaveFail});
+          return cb({ errCode: errorCodes.SaveFail });
         }
         if (file) {
-          fs.renameSync(`./public/uploads/vocabulary/${ today }/${ file.filename }`, `./public/uploads/${ vocabulary.image }`);
+          fs.renameSync(
+            `./public/uploads/vocabulary/${today}/${file.filename}`,
+            `./public/uploads/${vocabulary.image}`
+          );
         }
-        return cb({message: messageCodes.SaveSuccessful});
+        return cb({ message: messageCodes.SaveSuccessful });
       });
     },
 
@@ -88,7 +108,7 @@ module.exports = (vocabularyModel) => {
      */
     updateVocabulary: (vocabulary, file, cb) => {
       if (!vocabulary.title) {
-        return cb({errCode: errorCodes.InvalidTitle});
+        return cb({ errCode: errorCodes.InvalidTitle });
       }
 
       //  update fileName
@@ -97,18 +117,29 @@ module.exports = (vocabularyModel) => {
         vocabulary.image = "vocabulary" + "/" + today + "/" + fileName;
       }
 
-      vocabularyModel.where().findOneAndUpdate({title: vocabulary.title}, {$set: vocabulary}, (err) => {
-        if (err) {
-          if (file) {
-            fs.unlinkSync(`./public/uploads/vocabulary/${ today }/${ file.filename }`);
+      vocabularyModel
+        .where()
+        .findOneAndUpdate(
+          { title: vocabulary.title },
+          { $set: vocabulary },
+          err => {
+            if (err) {
+              if (file) {
+                fs.unlinkSync(
+                  `./public/uploads/vocabulary/${today}/${file.filename}`
+                );
+              }
+              return cb({ errCode: errorCodes.UpdateFail });
+            }
+            if (file) {
+              fs.renameSync(
+                `./public/uploads/vocabulary/${today}/${file.filename}`,
+                `./public/uploads/${vocabulary.image}`
+              );
+            }
+            return cb({ message: messageCodes.UpdateSuccessful });
           }
-          return cb({errCode: errorCodes.UpdateFail});
-        }
-        if (file) {
-          fs.renameSync(`./public/uploads/vocabulary/${ today }/${ file.filename }`, `./public/uploads/${ vocabulary.image }`);
-        }
-        return cb({message: messageCodes.UpdateSuccessful});
-      });
+        );
     },
     deleteVocabulary: (vocabulary, cb) => {
       let title = vocabulary.title;
@@ -116,15 +147,17 @@ module.exports = (vocabularyModel) => {
         return cb({ errCode: errorCodes.InvalidTitle });
       }
 
-      vocabularyModel.where().findOneAndRemove({ title: title }, (err, result) => {
-        if (err) {
-          return cb({ errCode: errorCodes.DeleteFail });
-        }
-        if (!result) {
-          return cb({ errCode: errorCodes.DeleteFail });
-        }
-        return cb({ message: messageCodes.DeleteSuccessful });
-      });
+      vocabularyModel
+        .where()
+        .findOneAndRemove({ title: title }, (err, result) => {
+          if (err) {
+            return cb({ errCode: errorCodes.DeleteFail });
+          }
+          if (!result) {
+            return cb({ errCode: errorCodes.DeleteFail });
+          }
+          return cb({ message: messageCodes.DeleteSuccessful });
+        });
     }
   };
 };
